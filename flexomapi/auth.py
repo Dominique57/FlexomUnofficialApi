@@ -3,6 +3,8 @@ from .models.sign_in import SignInReq, SignInRes
 from .models.buildings_info import BuildingsInfoRes
 from .models.building_authorizations import BuildingAuthorizationsRes
 from .models.building_auth import BuildingAuthReq, BuildingAuthRes
+from .models.zones import ZonesRes
+from .models.iot_list import IotsRes
 import json
 import requests
 import urllib.parse
@@ -57,12 +59,12 @@ def send_building_auths(building_id: str, bearer_tok: str):
     return parse_obj_as(BuildingAuthorizationsRes, jsonData)
 
 
-def send_building_auth(email: str, building_token: str):
-    req = BuildingAuthReq(email=email, password=building_token)
+def send_building_auth(email: str, building_tok: str):
+    req = BuildingAuthReq(email=email, password=building_tok)
     res = requests.post(
         "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/WS_UserManagement/login?includeFeatures=true",
         data=urllib.parse.urlencode(req.dict()),
-        headers={'Content-type': 'application/x-www-form-urlencoded'}
+        headers={ 'Content-type': 'application/x-www-form-urlencoded' }
     )
 
 
@@ -71,3 +73,28 @@ def send_building_auth(email: str, building_token: str):
 
     jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
     return parse_obj_as(BuildingAuthRes, jsonData)
+
+
+def send_zones(building_tok: str):
+    res = requests.get(
+        "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/zones",
+        headers={ 'authorization': f"Bearer {building_tok}" }
+    )
+
+    if not 200 <= res.status_code < 300:
+        raise Exception('Login token request error', res, res.content)
+
+    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(ZonesRes, jsonData)
+
+def send_iot_list(building_tok: str):
+    res = requests.get(
+        "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/intelligent-things/listV2",
+        headers={ 'authorization': f"Bearer {building_tok}" }
+    )
+
+    if not 200 <= res.status_code < 300:
+        raise Exception('Login token request error', res, res.content)
+
+    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(IotsRes, jsonData)

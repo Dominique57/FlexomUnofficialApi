@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Extra
 from typing import Dict, List
 
+
 class BuildingAuthReq(BaseModel):
     email: str
     password: str
