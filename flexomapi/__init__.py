@@ -1,8 +1,9 @@
+from .settings import USER_EMAIL, USER_PASS
 from .auth import send_auth, send_buildings_info, send_building_auths,      \
     send_building_auth
 
 def run():
-    res_auth = send_auth("dominique.michel98@yahoo.fr", "dont try using it ;)")
+    res_auth = send_auth(USER_EMAIL, USER_PASS)
     print(res_auth.json())
     print()
 
