@@ -3,7 +3,7 @@ from .auth import send_auth, send_buildings_info, send_building_auths,      \
     send_building_auth, send_zones, send_iot_list
 
 def run():
-    # Loin to account
+    # Login to account
     res_auth = send_auth(USER_EMAIL, USER_PASS)
     print(res_auth.json())
     print()

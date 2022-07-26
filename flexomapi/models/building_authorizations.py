@@ -37,7 +37,7 @@ class BuildingAuthorization(BaseModel):
     activated: bool
     transfer: bool
     user: User
-    type: str
+    type: Optional[str]
     active: bool
     expired: bool
     permanent: bool
