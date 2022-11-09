@@ -78,9 +78,9 @@ def send_building_auth(base_url: str, hemis_kernel_id: str, email: str, building
     return parse_obj_as(BuildingAuthRes, json_data)
 
 
-def send_zones(building_tok: str) -> ZonesRes:
+def send_zones(base_url: str, building_tok: str) -> ZonesRes:
     res = requests.get(
-        "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/zones",
+        f"{base_url}/zones",
         headers={'authorization': f"Bearer {building_tok}"}
     )
 
@@ -91,9 +91,9 @@ def send_zones(building_tok: str) -> ZonesRes:
     return parse_obj_as(ZonesRes, json_data)
 
 
-def send_iot_list(building_tok: str) -> IotsRes:
+def send_iot_list(base_url: str, building_tok: str) -> IotsRes:
     res = requests.get(
-        "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/intelligent-things/listV2",
+        f"{base_url}/intelligent-things/listV2",
         headers={'authorization': f"Bearer {building_tok}"}
     )
 

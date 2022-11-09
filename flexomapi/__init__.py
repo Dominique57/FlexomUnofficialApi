@@ -44,11 +44,11 @@ def run():
     print()
 
     # Get building's zones
-    res_zones = send_zones(res_bauth.token)
+    res_zones = send_zones(res_binfos.__root__[0].hemis_base_url, res_bauth.token)
     print(res_zones.json())
     print()
 
     # Get building's iot's
-    res_iots = send_iot_list(res_bauth.token)
+    res_iots = send_iot_list(res_binfos.__root__[0].hemis_base_url, res_bauth.token)
     print(res_iots.json())
     print()
