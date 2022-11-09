@@ -9,7 +9,8 @@ import json
 import requests
 import urllib.parse
 
-def send_auth(email: str, password: str) -> SignInReq:
+
+def send_auth(email: str, password: str) -> SignInRes:
     req = SignInReq(
         device=SignInReq.Device(
             uid="29c23c2aa953dc340f7525e57f0c8659",
@@ -19,82 +20,85 @@ def send_auth(email: str, password: str) -> SignInReq:
             first_connection=0,
             last_connection=0
         ),
-      email=email,
-      password=password
+        email=email,
+        password=password
     )
 
     res = requests.post(
         "https://hemisphere.ubiant.com/users/signin",
         data=req.json(),
-        headers={ 'Content-type': 'application/json' }
+        headers={'Content-type': 'application/json'}
     )
     if not 200 <= res.status_code < 300:
         raise Exception('Login token request error', res)
 
-    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
-    return parse_obj_as(SignInRes, jsonData)
+    json_data = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(SignInRes, json_data)
 
-def send_buildings_info(bearer_tok: str):
+
+def send_buildings_info(bearer_tok: str) -> BuildingsInfoRes:
     res = requests.get(
         "https://hemisphere.ubiant.com/buildings/mine/infos",
-        headers={ 'authorization': f"Bearer {bearer_tok}" }
+        headers={'authorization': f"Bearer {bearer_tok}"}
     )
 
     if not 200 <= res.status_code < 300:
         raise Exception('Login token request error', res, res.content)
 
-    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
-    return parse_obj_as(BuildingsInfoRes, jsonData)
+    json_data = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(BuildingsInfoRes, json_data)
 
-def send_building_auths(building_id: str, bearer_tok: str):
+
+def send_building_auths(building_id: str, bearer_tok: str) -> BuildingAuthorizationsRes:
     res = requests.get(
         f"https://hemisphere.ubiant.com/buildings/{building_id}/authorizations",
-        headers={ 'authorization': f"Bearer {bearer_tok}" }
+        headers={'authorization': f"Bearer {bearer_tok}"}
     )
 
     if not 200 <= res.status_code < 300:
         raise Exception('Login token request error', res, res.content)
 
-    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
-    return parse_obj_as(BuildingAuthorizationsRes, jsonData)
+    json_data = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(BuildingAuthorizationsRes, json_data)
 
 
-def send_building_auth(email: str, building_tok: str):
-    req = BuildingAuthReq(email=email, password=building_tok)
+def send_building_auth(base_url: str, hemis_kernel_id: str, email: str, building_tok: str)\
+        -> BuildingAuthRes:
+    req = BuildingAuthReq(email=email, password=building_tok, kernelId=hemis_kernel_id)
     res = requests.post(
-        "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/WS_UserManagement/login?includeFeatures=true",
+        f"{base_url}/WS_UserManagement/login?includeFeatures=true",
         data=urllib.parse.urlencode(req.dict()),
-        headers={ 'Content-type': 'application/x-www-form-urlencoded' }
+        headers={'Content-type': 'application/x-www-form-urlencoded'}
     )
-
 
     if not 200 <= res.status_code < 300:
         raise Exception('Login token request error', res, res.content)
 
-    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
-    return parse_obj_as(BuildingAuthRes, jsonData)
+    json_data = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(BuildingAuthRes, json_data)
 
 
-def send_zones(building_tok: str):
+def send_zones(building_tok: str) -> ZonesRes:
     res = requests.get(
         "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/zones",
-        headers={ 'authorization': f"Bearer {building_tok}" }
+        headers={'authorization': f"Bearer {building_tok}"}
     )
 
     if not 200 <= res.status_code < 300:
         raise Exception('Login token request error', res, res.content)
 
-    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
-    return parse_obj_as(ZonesRes, jsonData)
+    json_data = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(ZonesRes, json_data)
 
-def send_iot_list(building_tok: str):
+
+def send_iot_list(building_tok: str) -> IotsRes:
     res = requests.get(
         "https://tender-yonath-pu46isv5.eu-west.hemis.io/hemis/rest/intelligent-things/listV2",
-        headers={ 'authorization': f"Bearer {building_tok}" }
+        headers={'authorization': f"Bearer {building_tok}"}
     )
 
     if not 200 <= res.status_code < 300:
         raise Exception('Login token request error', res, res.content)
 
-    jsonData = json.JSONDecoder().decode(res.content.decode('utf-8'))
-    return parse_obj_as(IotsRes, jsonData)
+    json_data = json.JSONDecoder().decode(res.content.decode('utf-8'))
+    return parse_obj_as(IotsRes, json_data)

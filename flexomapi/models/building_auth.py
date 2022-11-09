@@ -5,7 +5,8 @@ from typing import Dict, List
 class BuildingAuthReq(BaseModel):
     email: str
     password: str
-    kernelId: str = 'hemis36'
+    kernelId: str
+
 
 class BuildingAuthRes(BaseModel, extra=Extra.ignore):
     token: str
