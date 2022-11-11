@@ -1,6 +1,6 @@
 from .settings import USER_EMAIL, USER_PASS
-from .auth import send_auth, send_buildings_info, send_building_auths,      \
-    send_building_auth, send_zones, send_iot_list
+from .auth import send_auth, send_buildings_info, send_building_auths
+from .client import BuildingClient
 
 
 def run():
@@ -36,19 +36,22 @@ def run():
     print()
 
     # Login to the building with given authorizations
-    res_bauth = send_building_auth(
-        res_binfos.__root__[0].hemis_base_url, res_binfos.__root__[0].kernel_slot, res_auth.email,
-        building_auth.token
+    res_bauths = BuildingClient.send_building_auth(
+        res_binfos.__root__[0].hemis_base_url, res_binfos.__root__[0].kernel_slot,
+        res_auth.email, building_auth.token
     )
     print(res_bauths.json())
     print()
 
+    # Create building client to fetch data
+    b_client = BuildingClient(res_binfos.__root__[0].hemis_base_url, res_bauths.token)
+
     # Get building's zones
-    res_zones = send_zones(res_binfos.__root__[0].hemis_base_url, res_bauth.token)
+    res_zones = b_client.send_zones()
     print(res_zones.json())
     print()
 
     # Get building's iot's
-    res_iots = send_iot_list(res_binfos.__root__[0].hemis_base_url, res_bauth.token)
+    res_iots = b_client.send_iot_list()
     print(res_iots.json())
     print()
