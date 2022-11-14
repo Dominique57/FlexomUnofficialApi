@@ -1,11 +1,10 @@
 from urllib.parse import urlencode
 import requests
 
-from . import SignInReq, SignInRes, BuildingsInfoRes, BuildingAuthorizationsRes, BuildingAuthReq, BuildingAuthRes
-from .utils import handle_res_throw
+from . import SignInReq, BuildingAuthReq
 
 
-def post_auth(email: str, password: str) -> SignInRes:
+def post_auth(email: str, password: str) -> requests.Response:
     req = SignInReq(
         device=SignInReq.Device(
             uid="29c23c2aa953dc340f7525e57f0c8659",
@@ -24,23 +23,23 @@ def post_auth(email: str, password: str) -> SignInRes:
         data=req.json(),
         headers={'Content-type': 'application/json'}
     )
-    return handle_res_throw(res, SignInRes)
+    return res
 
 
-def get_building_auths(building_id: str, bearer_tok: str) -> BuildingAuthorizationsRes:
+def get_building_auths(building_id: str, bearer_tok: str) -> requests.Response:
     res = requests.get(
         f"https://hemisphere.ubiant.com/buildings/{building_id}/authorizations",
         headers={'authorization': f"Bearer {bearer_tok}"}
     )
-    return handle_res_throw(res, BuildingAuthorizationsRes)
+    return res
 
 
 def post_building_auth(base_url: str, hemis_kernel_id: str, email: str,
-                       building_auth_token: str) -> BuildingAuthRes:
+                       building_auth_token: str) -> requests.Response:
     req = BuildingAuthReq(email=email, password=building_auth_token, kernelId=hemis_kernel_id)
     res = requests.post(
         f"{base_url}/WS_UserManagement/login?includeFeatures=true",
         data=urlencode(req.dict()),
         headers={'Content-type': 'application/x-www-form-urlencoded'}
     )
-    return handle_res_throw(res, BuildingAuthRes)
+    return res

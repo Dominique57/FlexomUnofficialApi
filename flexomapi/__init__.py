@@ -1,26 +1,37 @@
+from .models import SignInRes, BuildingsInfoRes, BuildingAuthorizationsRes, BuildingAuthRes, \
+    ZonesRes, IotsRes
+from .requests.auth import post_auth, get_building_auths, post_building_auth
+from .requests.building import get_buildings_info, get_zones, get_iots
+from .requests.request_handler import RequestHandler
 from .settings import USER_EMAIL, USER_PASS
-from .auth import send_auth, send_buildings_info, send_building_auths
-from .client import BuildingClient
 
 
 def run():
     # Login to account
-    res_auth = send_auth(USER_EMAIL, USER_PASS)
+    res_auth: SignInRes = RequestHandler(
+        lambda: post_auth(USER_EMAIL, USER_PASS),
+        lambda: None,
+        SignInRes
+    ).handle_or_throw()
     print(res_auth.json())
     print()
 
     # Get account's buildings
-    res_binfos = send_buildings_info(
-        res_auth.token
-    )
+    res_binfos: BuildingsInfoRes = RequestHandler(
+        lambda: get_buildings_info(res_auth.token),
+        lambda: None,
+        BuildingsInfoRes
+    ).handle_or_throw()
     print(res_binfos.json())
     print()
+    res_binfo = res_binfos.__root__[0]
 
     # Get buildings user's authorizations
-    res_bauths = send_building_auths(
-        res_binfos.__root__[0].buildingId,
-        res_auth.token
-    )
+    res_bauths: BuildingAuthorizationsRes = RequestHandler(
+        lambda: get_building_auths(res_binfo.buildingId, res_auth.token),
+        lambda: None,
+        BuildingAuthorizationsRes
+    ).handle_or_throw()
     print(res_bauths.json())
     print()
 
@@ -36,22 +47,29 @@ def run():
     print()
 
     # Login to the building with given authorizations
-    res_bauths = BuildingClient.send_building_auth(
-        res_binfos.__root__[0].hemis_base_url, res_binfos.__root__[0].kernel_slot,
-        res_auth.email, building_auth.token
-    )
+    res_bauth: BuildingAuthRes = RequestHandler(
+        lambda: post_building_auth(res_binfo.hemis_base_url, res_binfo.kernel_slot, res_auth.email,
+                                   building_auth.token),
+        lambda: None,
+        BuildingAuthRes
+    ).handle_or_throw()
     print(res_bauths.json())
     print()
 
-    # Create building client to fetch data
-    b_client = BuildingClient(res_binfos.__root__[0].hemis_base_url, res_bauths.token)
-
     # Get building's zones
-    res_zones = b_client.send_zones()
+    res_zones: ZonesRes = RequestHandler(
+        lambda: get_zones(res_binfo.hemis_base_url, res_bauth.token),
+        lambda: None,
+        ZonesRes
+    ).handle_or_throw()
     print(res_zones.json())
     print()
 
     # Get building's iot's
-    res_iots = b_client.send_iot_list()
+    res_iots: IotsRes = RequestHandler(
+        lambda: get_iots(res_binfo.hemis_base_url, res_bauth.token),
+        lambda: None,
+        IotsRes
+    ).handle_or_throw()
     print(res_iots.json())
     print()
