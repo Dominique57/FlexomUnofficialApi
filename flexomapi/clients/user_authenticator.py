@@ -1,5 +1,3 @@
-from typing import Optional
-
 from ..models import SignInRes
 from ..requests.auth import post_auth
 from ..requests.request_handler import RequestHandler
