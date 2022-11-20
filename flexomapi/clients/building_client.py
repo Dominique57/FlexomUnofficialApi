@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from ..models import BuildingInfo, ZonesRes, IotsRes
+from ..models import BuildingInfo, ZonesRes, IotsRes, ActuatorsRes
 from ..requests.request_handler import RequestHandler
-from ..requests.building import get_zones, get_iots
+from ..requests.building import get_zones, get_iots, get_actuators, put_actuator_state
 from .user_client import UserClient
 from .building_authenticator import BuildingAuthenticator
 
@@ -40,4 +40,19 @@ class BuildingClient:
             lambda: get_iots(self.building_info.hemis_base_url, self.building_token),
             lambda: self.re_authenticate(),
             IotsRes
+        ).handle_or_throw()
+
+    def get_actuators(self, iot_id: str) -> ActuatorsRes:
+        return RequestHandler(
+            lambda: get_actuators(self.building_info.hemis_base_url, self.building_token, iot_id),
+            lambda: self.re_authenticate(),
+            ActuatorsRes
+        ).handle_or_throw()
+
+    def put_actuator_state(self, iot_id: str, actuator_id: str, value: float) -> None:
+        return RequestHandler(
+            lambda: put_actuator_state(self.building_info.hemis_base_url, self.building_token,
+                                       iot_id, actuator_id, value),
+            lambda: self.re_authenticate(),
+            None
         ).handle_or_throw()

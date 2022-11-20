@@ -1,10 +1,19 @@
+from typing import Optional
+
 from .models import SignInRes, BuildingsInfoRes, BuildingAuthorizationsRes, BuildingAuthRes, \
-    ZonesRes, IotsRes
+    ZonesRes, IotsRes, Iot
 from .requests.auth import post_auth, get_building_auths, post_building_auth
 from .requests.building import get_buildings_info, get_zones, get_iots
 from .requests.request_handler import RequestHandler
 from .settings import USER_EMAIL, USER_PASS
 from .clients import UserClient, BuildingClient
+
+
+def search_item(array: list, cmp_function) -> Optional:
+    for item in array:
+        if cmp_function(item):
+            return item
+    return None
 
 
 def run_client():
@@ -14,10 +23,32 @@ def run_client():
     binfos = user_client.get_buildings_info()
     binfo = binfos.__root__[0]
     building_client = BuildingClient.build_client(user_client, binfo)
+
     zones = building_client.get_zones()
     print(zones.json())
+    print()
+
     iots = building_client.get_iots()
     print(iots.json())
+    print()
+
+    iot_tmp: Optional[Iot] = search_item(iots.__root__, lambda iot: "somfy" in iot.name.lower())
+    if iot_tmp is None:
+        raise Exception("Failed to find temperature iot")
+    print(iot_tmp)
+    print()
+
+    iot_actuators = building_client.get_actuators(iot_tmp.id)
+    if len(iot_actuators.__root__) < 1:
+        raise Exception("Iot device does not have actuators")
+    iot_actuator = iot_actuators.__root__[0]
+    print(iot_actuator)
+    print()
+
+    iot_tmp_value = 17
+    building_client.put_actuator_state(iot_tmp.id, iot_actuator.actuatorId, iot_tmp_value)
+    print(f"Set iot tmp value: `{iot_tmp_value}`")
+    print()
 
 
 def run_legacy():
