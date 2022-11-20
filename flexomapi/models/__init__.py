@@ -1,3 +1,4 @@
+from .actuators import *
 from .building_auth import *
 from .building_authorizations import *
 from .buildings_info import *

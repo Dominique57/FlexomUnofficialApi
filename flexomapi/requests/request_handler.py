@@ -47,13 +47,15 @@ class RequestHandler:
             return self.Error.HTTP_CODE, None
 
         # Step 3, try to convert response to class
-        try:
-            json_data = json.JSONDecoder().decode(response.content.decode('utf-8'))
-            result = parse_obj_as(self.result_class, json_data)
-        except ValidationError:
-            return self.Error.DTO_CONVERSION_TYPE, None
-        except ValueError:
-            return self.Error.JSON_DECODE, None
+        result = None
+        if self.result_class:
+            try:
+                json_data = json.JSONDecoder().decode(response.content.decode('utf-8'))
+                result = parse_obj_as(self.result_class, json_data)
+            except ValidationError:
+                return self.Error.DTO_CONVERSION_TYPE, None
+            except ValueError:
+                return self.Error.JSON_DECODE, None
 
         # Finished
         return self.Error.NO_ERROR, result
