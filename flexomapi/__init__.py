@@ -6,14 +6,8 @@ from .requests.auth import post_auth, get_building_auths, post_building_auth
 from .requests.building import get_buildings_info, get_zones, get_iots
 from .requests.request_handler import RequestHandler
 from .settings import USER_EMAIL, USER_PASS
+from .utils import search_item
 from .clients import UserClient, BuildingClient
-
-
-def search_item(array: list, cmp_function) -> Optional:
-    for item in array:
-        if cmp_function(item):
-            return item
-    return None
 
 
 def run_client():
